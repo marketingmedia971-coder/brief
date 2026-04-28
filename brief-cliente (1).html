@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brief de Cliente — Estrategia de Marketing</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0d0f;
+    --surface: #16161a;
+    --surface2: #1e1e24;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #f0ede8;
+    --muted: #7a7a8a;
+    --accent: #e8c97a;
+    --accent2: #c47a3a;
+    --accent-dim: rgba(232,201,122,0.12);
+    --danger: #e06c6c;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: -0.02em;
+    color: var(--accent);
+  }
+  .logo span { color: var(--text); }
+
+  /* PROGRESS */
+  .progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .prog-step {
+    flex: 1;
+    height: 3px;
+    background: var(--border2);
+    border-radius: 99px;
+    transition: background 0.4s;
+  }
+  .prog-step.done { background: var(--accent); }
+  .prog-step.active { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+  .step-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  /* LAYOUT */
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* SECTION INTRO */
+  .section-head {
+    margin-bottom: 36px;
+  }
+  .section-number {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+  .section-desc {
+    color: var(--muted);
+    font-size: 15px;
+    max-width: 540px;
+  }
+
+  /* STEP */
+  .step { display: none; animation: fadeIn 0.3s ease; }
+  .step.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* FORM ELEMENTS */
+  .field { margin-bottom: 24px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 8px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+  label .req { color: var(--accent); margin-left: 3px; }
+  label .hint { color: var(--muted); font-size: 12px; font-weight: 400; text-transform: none; display: block; margin-top: 2px; letter-spacing: 0; }
+
+  input[type="text"],
+  input[type="url"],
+  input[type="email"],
+  input[type="number"],
+  textarea,
+  select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    padding: 12px 14px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    appearance: none;
+  }
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--accent);
+    background: rgba(232,201,122,0.04);
+  }
+  textarea { resize: vertical; min-height: 100px; }
+  select option { background: #16161a; }
+
+  /* CHECKBOX GROUP */
+  .check-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 8px;
+  }
+  .check-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .check-item:hover { border-color: var(--border2); background: var(--surface); }
+  .check-item input[type="checkbox"] { display: none; }
+  .check-item.checked {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+  }
+  .check-box {
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid var(--border2);
+    border-radius: 4px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .check-item.checked .check-box {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .check-item.checked .check-box::after {
+    content: '';
+    width: 8px;
+    height: 5px;
+    border-left: 2px solid #0d0d0f;
+    border-bottom: 2px solid #0d0d0f;
+    transform: rotate(-45deg) translateY(-1px);
+    display: block;
+  }
+  .check-label { font-size: 13px; color: var(--text); }
+
+  /* RADIO GROUP */
+  .radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .radio-pill {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 7px 16px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text);
+  }
+  .radio-pill:hover { border-color: var(--border2); }
+  .radio-pill.selected {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+    color: var(--accent);
+  }
+  .radio-pill input { display: none; }
+
+  /* DIVIDER */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 32px 0;
+  }
+
+  /* DICHOTOMY SLIDERS */
+  .dicho-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .dicho-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    transition: border-color 0.2s;
+  }
+  .dicho-item:hover { border-color: var(--border2); }
+  .dicho-labels {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .dicho-left, .dicho-right {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    transition: color 0.2s;
+    flex: 1;
+  }
+  .dicho-right { text-align: right; }
+  .dicho-vs {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--border2);
+    text-transform: uppercase;
+    margin: 0 10px;
+    flex-shrink: 0;
+  }
+  .dicho-range {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 3px;
+    border-radius: 99px;
+    background: var(--border2);
+    outline: none;
+    cursor: pointer;
+  }
+  .dicho-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: 2px solid var(--bg);
+    box-shadow: 0 0 0 1px var(--accent);
+    transition: transform 0.1s;
+  }
+  .dicho-range::-webkit-slider-thumb:hover { transform: scale(1.2); }
+  .dicho-range::-moz-range-thumb {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--accent); cursor: pointer;
+    border: 2px solid var(--bg);
+  }
+
+  /* CARD GROUP */
+  .card-group { display: flex; flex-direction: column; gap: 12px; }
+  .card-input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+  }
+  .card-input-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+
+  /* BUTTONS */
+  .btn-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 40px;
+    gap: 12px;
+  }
+  .btn {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 13px 28px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #0d0d0f;
+  }
+  .btn-primary:hover { background: #f0d690; transform: translateY(-1px); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border2);
+  }
+  .btn-secondary:hover { color: var(--text); border-color: var(--text); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  /* SUMMARY */
+  .summary-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .summary-section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .summary-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .summary-key {
+    color: var(--muted);
+    flex-shrink: 0;
+    width: 180px;
+  }
+  .summary-val { color: var(--text); }
+
+  /* TAG */
+  .tag {
+    display: inline-block;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid rgba(232,201,122,0.25);
+    border-radius: 99px;
+    font-size: 12px;
+    padding: 3px 10px;
+    margin: 2px;
+  }
+
+  /* PRINT BUTTON */
+  .export-btn {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px dashed var(--border2);
+    border-radius: var(--radius);
+    padding: 16px;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 16px;
+  }
+  .export-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* DICHO summary */
+  .dicho-summary-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+  .dicho-bar-wrap {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 99px;
+    position: relative;
+    overflow: hidden;
+  }
+  .dicho-bar-fill {
+    position: absolute;
+    height: 100%;
+    background: var(--accent);
+    border-radius: 99px;
+    transition: width 0.3s;
+  }
+  .dicho-bar-label-l { color: var(--muted); width: 110px; text-align: right; flex-shrink: 0; }
+  .dicho-bar-label-r { color: var(--muted); width: 110px; flex-shrink: 0; }
+
+  @media (max-width: 600px) {
+    .field-row { grid-template-columns: 1fr; }
+    .header { padding: 14px 16px; }
+    .container { padding: 32px 16px 60px; }
+    .section-title { font-size: 24px; }
+    .dicho-bar-label-l, .dicho-bar-label-r { width: 70px; font-size: 11px; }
+    .summary-key { width: 120px; }
+  }
+
+  @media print {
+    .header, .btn-row, .export-btn { display: none !important; }
+    body { background: white; color: black; }
+    .summary-section { border: 1px solid #ddd; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">brief<span>.</span></div>
+  <div class="progress-wrap" id="progressWrap"></div>
+  <div class="step-label" id="stepLabel">Paso 1 de 7</div>
+</div>
+
+<div class="container">
+
+  <!-- ═══ PASO 1: Tu Negocio ═══ -->
+  <div class="step active" id="step-0">
+    <div class="section-head">
+      <div class="section-number">Paso 01 / 07</div>
+      <div class="section-title">Tu Negocio</div>
+      <div class="section-desc">Empecemos con lo básico. Cuéntanos quién eres y qué hace tu empresa.</div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Nombre del negocio <span class="req">*</span></label>
+        <input type="text" id="biz_name" placeholder="Ej: Studio Merkado">
+      </div>
+      <div class="field">
+        <label>Rubro / Industria <span class="req">*</span></label>
+        <select id="biz_industry">
+          <option value="">Seleccionar...</option>
+          <option>Moda y Vestimenta</option>
+          <option>Alimentación y Gastronomía</option>
+          <option>Salud y Bienestar</option>
+          <option>Belleza y Estética</option>
+          <option>Educación y Capacitación</option>
+          <option>Tecnología y Software</option>
+          <option>Inmobiliario y Construcción</option>
+          <option>Servicios Profesionales</option>
+          <option>Retail y Comercio</option>
+          <option>Turismo y Hospitalidad</option>
+          <option>Finanzas y Seguros</option>
+          <option>Deportes y Fitness</option>
+          <option>Arte y Entretenimiento</option>
+          <option>Otro</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Industria específica (si seleccionaste "Otro" o quieres detallar)</label>
+      <input type="text" id="biz_industry_other" placeholder="Ej: Consultoría de imagen corporativa">
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>¿Hace cuánto existe tu negocio?</label>
+        <select id="biz_age">
+          <option value="">Seleccionar...</option>
+          <option>Menos de 1 año</option>
+          <option>1 a 3 años</option>
+          <option>3 a 5 años</option>
+          <option>Más de 5 años</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>¿Dónde operas?</label>
+        <select id="biz_location">
+          <option value="">Seleccionar...</option>
+          <option>Solo online</option>
+          <option>Solo físico (local/ciudad)</option>
+          <option>Físico + online</option>
+          <option>Toda la Argentina</option>
+          <option>Latinoamérica</option>
+          <option>Internacional</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Sitio web o perfil principal <span class="hint">Instagram, TikTok, web, etc.</span></label>
+      <input type="url" id="biz_url" placeholder="https://...">
+    </div>
+
+    <div class="field">
+      <label>¿Qué hace exactamente tu negocio? <span class="req">*</span><span class="hint">Descríbelo en 2–4 oraciones como si se lo explicaras a alguien que no te conoce.</span></label>
+      <textarea id="biz_desc" rows="4" placeholder="Ej: Somos una marca de ropa femenina que diseña prendas de autor con telas naturales. Vendemos a través de Instagram y en showroom privado en Palermo..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>¿Cuál es la historia o el origen de tu marca? <span class="hint">¿Por qué la creaste? ¿Qué problema querías resolver?</span></label>
+      <textarea id="biz_story" rows="3" placeholder="Ej: La fundé porque no encontraba ropa que fuera cómoda Y con diseño. Quería demostrar que no hay que elegir entre las dos cosas..."></textarea>
+    </div>
+
+    <div class="btn-row">
+      <span></span>
+      <button class="btn btn-primary" onclick="goStep(1)">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- ═══ PASO 2: Producto / Servicio ═══ -->
+  <div class="step" id="step-1">
+    <div class="section-head">
+      <div class="section-number">Paso 02 / 07</div>
+      <div class="section-title">Tu Producto o Servicio</div>
+      <div class="section-desc">Queremos entender qué vendés, cómo lo vendés y qué lo hace especial.</div>
+    </div>
+
+    <div class="field">
+      <label>¿Qué vendés exactamente? <span class="req">*</span><span class="hint">Lista tus productos o servicios principales.</span></label>
+      <textarea id="prod_what" rows="3" placeholder="Ej: Cursos online de inglés para adultos (3 niveles), clases particulares online, membresía mensual con comunidad privada..."></textarea>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Tipo de negocio</label>
+        <div class="radio-group" id="prod_type">
+          <label class="radio-pill"><input type="radio" name="prod_type" value="Producto físico"> Producto físico</label>
+          <label class="radio-pill"><input type="radio" name="prod_type" value="Producto digital"> Producto digital</label>
+          <label class="radio-pill"><input type="radio" name="prod_type" value="Servicio"> Servicio</label>
+          <label class="radio-pill"><input type="radio" name="prod_type" value="Híbrido"> Híbrido</label>
+        </div>
+      </div>
+      <div class="field">
+        <label>¿Dónde se vende?</label>
+        <div class="radio-group" id="prod_channel">
+          <label class="radio-pill"><input type="radio" name="prod_channel" value="Solo online"> Solo online</label>
+          <label class="radio-pill"><input type="radio" name="prod_channel" value="Solo físico"> Solo físico</label>
+          <label class="radio-pill"><input type="radio" name="prod_channel" value="Ambos"> Ambos</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Rango de precio / ticket promedio</label>
+        <select id="prod_price">
+          <option value="">Seleccionar...</option>
+          <option>Menos de $5.000</option>
+          <option>$5.000 – $20.000</option>
+          <option>$20.000 – $60.000</option>
+          <option>$60.000 – $150.000</option>
+          <option>$150.000 – $500.000</option>
+          <option>Más de $500.000</option>
+          <option>En USD / precio internacional</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Modelo de compra</label>
+        <select id="prod_model">
+          <option value="">Seleccionar...</option>
+          <option>Compra única</option>
+          <option>Suscripción / membresía mensual</option>
+          <option>Recurrente sin suscripción</option>
+          <option>Por proyecto / cotización</option>
+          <option>Freemium</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>¿Qué hace ÚNICO a tu producto/servicio? <span class="req">*</span><span class="hint">¿Qué no tiene ningún otro? ¿Por qué alguien te elegiría a vos y no a la competencia?</span></label>
+      <textarea id="prod_unique" rows="3" placeholder="Ej: Somos los únicos que combinamos nutrición personalizada con seguimiento psicológico. No damos dietas genéricas, trabajamos la relación emocional con la comida..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>¿Cuáles son los 3 beneficios principales que recibe el cliente? <span class="hint">No características, sino resultados / transformaciones.</span></label>
+      <textarea id="prod_benefits" rows="3" placeholder="Ej: 1. Baja de peso sin efecto rebote. 2. Aprende a comer sin culpa. 3. Más energía en el día a día..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>¿Tienen testimonios, casos de éxito o prueba social? <span class="hint">Resumí brevemente los más potentes.</span></label>
+      <textarea id="prod_proof" rows="2" placeholder="Ej: +200 alumnas graduadas, tasa de finalización del 87%, varias con trabajos en empresas internacionales..."></textarea>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goStep(0)">← Atrás</button>
+      <button class="btn btn-primary" onclick="goStep(2)">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- ═══ PASO 3: Cliente Ideal ═══ -->
+  <div class="step" id="step-2">
+    <div class="section-head">
+      <div class="section-number">Paso 03 / 07</div>
+      <div class="section-title">Tu Cliente Ideal</div>
+      <div class="section-desc">Sin entender a quién le hablás, no se puede crear contenido que conecte ni anuncios que conviertan.</div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Rango de edad principal</label>
+        <select id="cli_age">
+          <option value="">Seleccionar...</option>
+          <option>13 – 17 años</option>
+          <option>18 – 24 años</option>
+          <option>25 – 34 años</option>
+          <option>35 – 44 años</option>
+          <option>45 – 54 años</option>
+          <option>55+ años</option>
+          <option>Varias edades</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Género predominante</label>
+        <div class="radio-group" id="cli_gender">
+          <label class="radio-pill"><input type="radio" name="cli_gender" value="Mayormente mujeres"> Mayormente mujeres</label>
+          <label class="radio-pill"><input type="radio" name="cli_gender" value="Mayormente hombres"> Mayormente hombres</label>
+          <label class="radio-pill"><input type="radio" name="cli_gender" value="Mixto equilibrado"> Mixto</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>¿Dónde vive tu cliente ideal? <span class="hint">Ciudad, país, zona geográfica.</span></label>
+      <input type="text" id="cli_location" placeholder="Ej: AMBA, Argentina / Latinoamérica / Ciudad de Buenos Aires">
+    </div>
+
+    <div class="field">
+      <label>Describe a tu cliente ideal en detalle <span class="req">*</span><span class="hint">¿Qué hace? ¿Cómo es su vida? ¿Cuáles son sus valores, miedos, deseos?</span></label>
+      <textarea id="cli_profile" rows="4" placeholder="Ej: Mujeres de 28-40 años, profesionales o emprendedoras. Se preocupan por su salud pero tienen poco tiempo. Siguen cuentas de wellness en Instagram. Valoran los productos naturales pero también la comodidad. Su mayor miedo es el efecto rebote y perder el tiempo en dietas que no funcionan..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>¿Cuál es el GRAN problema o dolor que tu cliente quiere resolver? <span class="req">*</span></label>
+      <textarea id="cli_pain" rows="2" placeholder="Ej: No saben cómo bajar de peso sin pasar hambre ni sacrificar su vida social..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>¿Qué objeción más común tiene antes de comprarte? <span class="hint">¿Qué duda o excusa le impide comprar?</span></label>
+      <textarea id="cli_objection" rows="2" placeholder="Ej: 'No tengo tiempo', 'Ya probé mil dietas y ninguna funcionó', 'Es caro', 'No sé si me va a servir a mí'..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>¿Qué redes sociales usa tu cliente? <span class="hint">Selecciona todas las que aplican.</span></label>
+      <div class="check-grid" id="cli_social">
+        <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox" value="Instagram"><div class="check-box"></div><span class="check-label">Instagram</span></div>
+        <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox" value="TikTok"><div class="check-box"></div><span class="check-label">TikTok</span></div>
+        <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox" value="Facebook"><div class="check-box"></div><span class="check-label">Facebook</span></div>
+        <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox" value="YouTube"><div class="check-box"></div><span class="check-label">YouTube</span></div>
+        <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox" value="LinkedIn"><div class="check-box"></div><span class="check-label">LinkedIn</span></div>
+        <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox" value="WhatsApp/Telegram"><div class="check-box"></div><span class="check-label">WhatsApp / Telegram</span></div>
+        <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox" value="Pinterest"><div class="check-box"></div><span class="check-label">Pinterest</span></div>
+        <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox" value="Twitter/X"><div class="check-box"></div><span class="check-label">Twitter / X</span></div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goStep(1)">← Atrás</button>
+      <button class="btn btn-primary" onclick="goStep(3)">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- ═══ PASO 4: Competencia ═══ -->
+  <div class="step" id="step-3">
+    <div class="section-head">
+      <div class="section-number">Paso 04 / 07</div>
+      <div class="section-title">Competencia y Mercado</div>
+      <div class="section-desc">Entender el entorno competitivo es clave para posicionarte diferente.</div>
+    </div>
+
+    <div class="field">
+      <label>¿Quiénes son tus principales competidores? <span class="hint">Nombrá 2–4 marcas, personas o negocios similares.</span></label>
+      <textarea id="comp_names" rows="2" placeholder="Ej: Marca A (tiene mejor precio), Marca B (tiene más seguidores), Marca C (similar pero más premium)..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>¿En qué se diferencia tu propuesta de la de ellos? <span class="req">*</span></label>
+      <textarea id="comp_diff" rows="3" placeholder="Ej: A diferencia de la competencia, nosotros no vendemos una dieta genérica sino un plan totalmente personalizado con acompañamiento semanal..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>¿Qué posición ocupás en el mercado actualmente?</label>
+      <div class="radio-group" id="comp_position">
+        <label class="radio-pill"><input type="radio" name="comp_position" value="Soy nuevo/emergente"> Nuevo / emergente</label>
+        <label class="radio-pill"><input type="radio" name="comp_position" value="Creciendo con base consolidada"> Creciendo</label>
+        <label class="radio-pill"><input type="radio" name="comp_position" value="Referente en mi nicho"> Referente en mi nicho</label>
+        <label class="radio-pill"><input type="radio" name="comp_position" value="Líder del mercado"> Líder del mercado</label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>¿A qué marcas (dentro o fuera de tu rubro) querés parecerte en estilo de comunicación? <span class="hint">Marcas que admires por cómo se muestran, no necesariamente por lo que venden.</span></label>
+      <textarea id="comp_inspiration" rows="2" placeholder="Ej: Me gusta cómo comunica Nike (aspiracional y directo), cómo Glossier construye comunidad, y la estética visual de Zara Home..."></textarea>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goStep(2)">← Atrás</button>
+      <button class="btn btn-primary" onclick="goStep(4)">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- ═══ PASO 5: Marketing Actual ═══ -->
+  <div class="step" id="step-4">
+    <div class="section-head">
+      <div class="section-number">Paso 05 / 07</div>
+      <div class="section-title">Marketing Actual</div>
+      <div class="section-desc">¿Qué estás haciendo hoy? ¿Qué funcionó y qué no? Eso nos ahorra tiempo y plata.</div>
+    </div>
+
+    <div class="field">
+      <label>¿En qué redes o plataformas tenés presencia actualmente? <span class="hint">Selecciona todas las que aplican.</span></label>
+      <div class="check-grid" id="mkt_presence">
+        <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox" value="Instagram"><div class="check-box"></div><span class="check-label">Instagram</span></div>
+        <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox" value="TikTok"><div class="check-box"></div><span class="check-label">TikTok</span></div>
+        <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox" value="Facebook"><div class="check-box"></div><span class="check-label">Facebook</span></div>
+        <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox" value="YouTube"><div class="check-box"></div><span class="check-label">YouTube</span></div>
+        <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox" value="LinkedIn"><div class="check-box"></div><span class="check-label">LinkedIn</span></div>
+        <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox" value="WhatsApp Business"><div class="check-box"></div><span class="check-label">WhatsApp Business</span></div>
+        <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox" value="Email marketing"><div class="check-box"></div><span class="check-label">Email marketing</span></div>
+        <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox" value="Sitio web propio"><div class="check-box"></div><span class="check-label">Sitio web propio</span></div>
+        <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox" value="Tienda online (Tiendanube, etc.)"><div class="check-box"></div><span class="check-label">Tienda online</span></div>
+        <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox" value="Marketplace (MercadoLibre, etc.)"><div class="check-box"></div><span class="check-label">Marketplace</span></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>¿Publicás contenido orgánico actualmente?</label>
+      <div class="radio-group" id="mkt_organic">
+        <label class="radio-pill"><input type="radio" name="mkt_organic" value="Sí, de forma consistente"> Sí, consistentemente</label>
+        <label class="radio-pill"><input type="radio" name="mkt_organic" value="Sí, pero sin estrategia"> Sí pero sin estrategia</label>
+        <label class="radio-pill"><input type="radio" name="mkt_organic" value="Poco o nada"> Poco o nada</label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>¿Estás haciendo publicidad paga actualmente?</label>
+      <div class="radio-group" id="mkt_paid">
+        <label class="radio-pill"><input type="radio" name="mkt_paid" value="Sí, Meta Ads"> Meta Ads</label>
+        <label class="radio-pill"><input type="radio" name="mkt_paid" value="Sí, Google Ads"> Google Ads</label>
+        <label class="radio-pill"><input type="radio" name="mkt_paid" value="Sí, TikTok Ads"> TikTok Ads</label>
+        <label class="radio-pill"><input type="radio" name="mkt_paid" value="Sí pero no sé bien qué"> No sé bien qué hago</label>
+        <label class="radio-pill"><input type="radio" name="mkt_paid" value="No, nunca hice"> No, nunca</label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Presupuesto mensual disponible para publicidad paga</label>
+      <select id="mkt_budget">
+        <option value="">Seleccionar...</option>
+        <option>Aún no definido</option>
+        <option>Menos de $30.000/mes</option>
+        <option>$30.000 – $100.000/mes</option>
+        <option>$100.000 – $300.000/mes</option>
+        <option>$300.000 – $1.000.000/mes</option>
+        <option>Más de $1.000.000/mes</option>
+        <option>En USD</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>¿Qué contenido o acción te funcionó MEJOR hasta ahora? <span class="hint">Un posteo viral, un tipo de Reel, una promoción, etc.</span></label>
+      <textarea id="mkt_best" rows="2" placeholder="Ej: Los Reels donde muestro el 'antes y después' de mis clientes tienen mucho más alcance. Una vez que hice un sorteo en Stories, tripliqué seguidores en una semana..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>¿Qué intentaste y NO funcionó?</label>
+      <textarea id="mkt_worst" rows="2" placeholder="Ej: Boosteamos una foto estática y no hubo casi resultados. Los posts informativos tienen muy poco engagement..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>¿Cuál es el objetivo principal de tu marketing ahora mismo? <span class="req">*</span></label>
+      <div class="radio-group" id="mkt_goal">
+        <label class="radio-pill"><input type="radio" name="mkt_goal" value="Aumentar seguidores / comunidad"> Crecer comunidad</label>
+        <label class="radio-pill"><input type="radio" name="mkt_goal" value="Generar ventas directas"> Generar ventas</label>
+        <label class="radio-pill"><input type="radio" name="mkt_goal" value="Conseguir leads / consultas"> Conseguir leads</label>
+        <label class="radio-pill"><input type="radio" name="mkt_goal" value="Posicionar la marca"> Posicionar marca</label>
+        <label class="radio-pill"><input type="radio" name="mkt_goal" value="Fidelizar clientes actuales"> Fidelizar clientes</label>
+        <label class="radio-pill"><input type="radio" name="mkt_goal" value="Lanzar un producto/servicio nuevo"> Lanzar algo nuevo</label>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goStep(3)">← Atrás</button>
+      <button class="btn btn-primary" onclick="goStep(5)">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- ═══ PASO 6: Dicotomías ═══ -->
+  <div class="step" id="step-5">
+    <div class="section-head">
+      <div class="section-number">Paso 06 / 07</div>
+      <div class="section-title">ADN de tu Marca</div>
+      <div class="section-desc">Definí tu marca eligiendo entre opuestos. Mové el slider hacia el extremo que más representa a tu marca. El centro significa equilibrio entre ambos.</div>
+    </div>
+
+    <div class="dicho-grid" id="dichoGrid"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goStep(4)">← Atrás</button>
+      <button class="btn btn-primary" onclick="goStep(6)">Ver resumen →</button>
+    </div>
+  </div>
+
+  <!-- ═══ PASO 7: Resumen ═══ -->
+  <div class="step" id="step-6">
+    <div class="section-head">
+      <div class="section-number">Paso 07 / 07</div>
+      <div class="section-title">Brief Completo</div>
+      <div class="section-desc">Revisá el resumen de tu brief. Podés volver atrás para editar cualquier sección.</div>
+    </div>
+
+    <div id="summaryContent"></div>
+
+    <button class="export-btn" id="exportPdfBtn" onclick="exportPDF()">↓ Descargar Brief como PDF</button>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goStep(5)">← Editar</button>
+      <button class="btn btn-primary" onclick="copyBrief()">Copiar brief completo</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const TOTAL_STEPS = 7;
+let currentStep = 0;
+
+const dichos = [
+  ["Tradicional","Innovador"],["Formal","Informal"],["Premium","Accesible"],
+  ["Funcional","Emocional"],["Local","Global"],["Lujoso","Minimalista"],
+  ["Exclusivo","Inclusivo"],["Individualista","Comunitario"],["Sofisticado","Casual"],
+  ["Orientado al producto","Orientado al cliente"],["Ecológico","Tecnológico"],
+  ["Serio","Divertido"],["Audaz","Conservador"],["Simple","Complejo"],
+  ["Artístico","Científico"],["Masculino","Femenino"],["Personalizado","Estandarizado"],
+  ["Cálido","Frío"],["Orientado al futuro","Enfocado en la tradición"],
+  ["Visible","Discreto"],["Intensidad","Serenidad"],["Experimental","Conservador"],
+  ["Alta tecnología","Bajo impacto"],["Rendimiento","Estilo"],["Práctico","Inspirador"],
+  ["Rebelde","Aceptado"],["Riesgo","Seguridad"],["Exigente","Relajado"],
+  ["Velocidad","Calidad"],["Acción inmediata","Crecimiento a largo plazo"],
+  ["Exclusivo","Mainstream"],["Noche","Día"]
+];
+
+// Build dichotomic sliders
+const grid = document.getElementById('dichoGrid');
+dichos.forEach(([left, right], i) => {
+  const div = document.createElement('div');
+  div.className = 'dicho-item';
+  div.innerHTML = `
+    <div class="dicho-labels">
+      <span class="dicho-left" id="dl${i}">${left}</span>
+      <span class="dicho-vs">vs</span>
+      <span class="dicho-right" id="dr${i}">${right}</span>
+    </div>
+    <input type="range" class="dicho-range" id="dicho${i}" min="0" max="100" value="50" oninput="updateDicho(${i},this.value)">
+  `;
+  grid.appendChild(div);
+});
+
+function updateDicho(i, val) {
+  const left = document.getElementById('dl'+i);
+  const right = document.getElementById('dr'+i);
+  const v = parseInt(val);
+  if (v < 40) {
+    left.style.color = 'var(--accent)';
+    right.style.color = 'var(--muted)';
+  } else if (v > 60) {
+    left.style.color = 'var(--muted)';
+    right.style.color = 'var(--accent)';
+  } else {
+    left.style.color = 'var(--muted)';
+    right.style.color = 'var(--muted)';
+  }
+}
+
+// Progress
+function renderProgress() {
+  const wrap = document.getElementById('progressWrap');
+  wrap.innerHTML = '';
+  for (let i = 0; i < TOTAL_STEPS; i++) {
+    const d = document.createElement('div');
+    d.className = 'prog-step ' + (i < currentStep ? 'done' : i === currentStep ? 'active' : '');
+    wrap.appendChild(d);
+  }
+  document.getElementById('stepLabel').textContent = `Paso ${currentStep+1} de ${TOTAL_STEPS}`;
+}
+
+function goStep(n) {
+  document.getElementById('step-'+currentStep).classList.remove('active');
+  currentStep = n;
+  document.getElementById('step-'+currentStep).classList.add('active');
+  renderProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (n === 6) buildSummary();
+}
+
+// Checkboxes
+function toggleCheck(el) {
+  el.classList.toggle('checked');
+  el.querySelector('input').checked = el.classList.contains('checked');
+}
+
+// Radio pills
+document.querySelectorAll('.radio-pill').forEach(pill => {
+  pill.addEventListener('click', function() {
+    const name = this.querySelector('input').name;
+    document.querySelectorAll(`[name="${name}"]`).forEach(r => {
+      r.closest('.radio-pill').classList.remove('selected');
+    });
+    this.classList.add('selected');
+    this.querySelector('input').checked = true;
+  });
+});
+
+function getVal(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+function getChecked(groupId) {
+  const items = document.querySelectorAll(`#${groupId} .check-item.checked`);
+  return Array.from(items).map(i => i.querySelector('input').value);
+}
+
+function getRadio(name) {
+  const el = document.querySelector(`[name="${name}"]:checked`);
+  return el ? el.value : '';
+}
+
+function buildSummary() {
+  const s = document.getElementById('summaryContent');
+
+  // Dichos
+  const dichResults = dichos.map(([l,r], i) => {
+    const v = parseInt(document.getElementById('dicho'+i).value);
+    let label = '';
+    if (v <= 20) label = l + ' (muy marcado)';
+    else if (v <= 40) label = l + ' (tendencia)';
+    else if (v <= 60) label = 'Equilibrio';
+    else if (v <= 80) label = r + ' (tendencia)';
+    else label = r + ' (muy marcado)';
+    return { l, r, v, label };
+  });
+
+  const notable = dichResults.filter(d => d.v <= 30 || d.v >= 70);
+
+  s.innerHTML = `
+    <div class="summary-section">
+      <div class="summary-section-title">El Negocio</div>
+      ${row('Nombre', getVal('biz_name'))}
+      ${row('Industria', getVal('biz_industry') || getVal('biz_industry_other'))}
+      ${row('Antigüedad', getVal('biz_age'))}
+      ${row('Dónde opera', getVal('biz_location'))}
+      ${row('URL / Perfil', getVal('biz_url'))}
+      ${row('Descripción', getVal('biz_desc'))}
+      ${row('Historia / Origen', getVal('biz_story'))}
+    </div>
+    <div class="summary-section">
+      <div class="summary-section-title">Producto / Servicio</div>
+      ${row('Qué vende', getVal('prod_what'))}
+      ${row('Tipo', getRadio('prod_type'))}
+      ${row('Canal de venta', getRadio('prod_channel'))}
+      ${row('Precio / ticket', getVal('prod_price'))}
+      ${row('Modelo de compra', getVal('prod_model'))}
+      ${row('Diferencial único', getVal('prod_unique'))}
+      ${row('Beneficios principales', getVal('prod_benefits'))}
+      ${row('Prueba social', getVal('prod_proof'))}
+    </div>
+    <div class="summary-section">
+      <div class="summary-section-title">Cliente Ideal</div>
+      ${row('Rango de edad', getVal('cli_age'))}
+      ${row('Género', getRadio('cli_gender'))}
+      ${row('Ubicación', getVal('cli_location'))}
+      ${row('Perfil detallado', getVal('cli_profile'))}
+      ${row('Dolor principal', getVal('cli_pain'))}
+      ${row('Objeción principal', getVal('cli_objection'))}
+      ${row('Redes que usa', getChecked('cli_social').join(', '))}
+    </div>
+    <div class="summary-section">
+      <div class="summary-section-title">Competencia y Mercado</div>
+      ${row('Competidores', getVal('comp_names'))}
+      ${row('Diferenciación', getVal('comp_diff'))}
+      ${row('Posición en mercado', getRadio('comp_position'))}
+      ${row('Referencias de comunicación', getVal('comp_inspiration'))}
+    </div>
+    <div class="summary-section">
+      <div class="summary-section-title">Marketing Actual</div>
+      ${row('Presencia en redes', getChecked('mkt_presence').join(', '))}
+      ${row('Contenido orgánico', getRadio('mkt_organic'))}
+      ${row('Publicidad paga', getRadio('mkt_paid'))}
+      ${row('Presupuesto mensual', getVal('mkt_budget'))}
+      ${row('Qué funcionó', getVal('mkt_best'))}
+      ${row('Qué no funcionó', getVal('mkt_worst'))}
+      ${row('Objetivo principal', getRadio('mkt_goal'))}
+    </div>
+    <div class="summary-section">
+      <div class="summary-section-title">ADN de Marca — Dicotomías destacadas</div>
+      ${notable.length === 0 ? '<p style="color:var(--muted);font-size:13px;">Todo centrado (sin tendencias marcadas).</p>' :
+        notable.map(d => `
+          <div class="dicho-summary-row">
+            <span class="dicho-bar-label-l">${d.l}</span>
+            <div class="dicho-bar-wrap">
+              <div class="dicho-bar-fill" style="left:${Math.min(d.v,50)}%;width:${Math.abs(d.v-50)}%;${d.v<50?'left:'+d.v+'%':'left:50%'}"></div>
+              <div class="dicho-bar-fill" style="width:${Math.abs(d.v-50)}%;${d.v>=50?'left:50%':'left:'+d.v+'%'}"></div>
+            </div>
+            <span class="dicho-bar-label-r">${d.r}</span>
+          </div>
+        `).join('')}
+      <br>
+      <p style="font-size:12px;color:var(--muted);">Resumen completo de las 32 dicotomías:</p>
+      <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;">
+        ${dichResults.map(d => `<span class="tag">${d.v<50?d.l:d.v>50?d.r:'Equilibrio'}</span>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function row(k, v) {
+  if (!v) return '';
+  return `<div class="summary-row"><span class="summary-key">${k}</span><span class="summary-val">${v}</span></div>`;
+}
+
+function copyBrief() {
+  const dichoSummary = dichos.map(([l,r], i) => {
+    const v = parseInt(document.getElementById('dicho'+i).value);
+    let side = v < 40 ? l : v > 60 ? r : 'Equilibrio';
+    return `• ${l} vs ${r}: ${side}`;
+  }).join('\n');
+
+  const text = `BRIEF DE CLIENTE
+=================
+
+NEGOCIO
+Nombre: ${getVal('biz_name')}
+Industria: ${getVal('biz_industry') || getVal('biz_industry_other')}
+Antigüedad: ${getVal('biz_age')}
+Opera en: ${getVal('biz_location')}
+URL: ${getVal('biz_url')}
+Descripción: ${getVal('biz_desc')}
+Historia: ${getVal('biz_story')}
+
+PRODUCTO / SERVICIO
+Qué vende: ${getVal('prod_what')}
+Tipo: ${getRadio('prod_type')}
+Canal: ${getRadio('prod_channel')}
+Precio: ${getVal('prod_price')}
+Modelo: ${getVal('prod_model')}
+Diferencial: ${getVal('prod_unique')}
+Beneficios: ${getVal('prod_benefits')}
+Prueba social: ${getVal('prod_proof')}
+
+CLIENTE IDEAL
+Edad: ${getVal('cli_age')}
+Género: ${getRadio('cli_gender')}
+Ubicación: ${getVal('cli_location')}
+Perfil: ${getVal('cli_profile')}
+Dolor principal: ${getVal('cli_pain')}
+Objeción: ${getVal('cli_objection')}
+Redes: ${getChecked('cli_social').join(', ')}
+
+COMPETENCIA
+Competidores: ${getVal('comp_names')}
+Diferenciación: ${getVal('comp_diff')}
+Posición: ${getRadio('comp_position')}
+Referencias: ${getVal('comp_inspiration')}
+
+MARKETING ACTUAL
+Presencia: ${getChecked('mkt_presence').join(', ')}
+Orgánico: ${getRadio('mkt_organic')}
+Publicidad paga: ${getRadio('mkt_paid')}
+Presupuesto: ${getVal('mkt_budget')}
+Qué funcionó: ${getVal('mkt_best')}
+Qué no funcionó: ${getVal('mkt_worst')}
+Objetivo: ${getRadio('mkt_goal')}
+
+ADN DE MARCA — DICOTOMÍAS
+${dichoSummary}`;
+
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.target;
+    btn.textContent = '¡Copiado!';
+    setTimeout(() => btn.textContent = 'Copiar brief completo', 2000);
+  });
+}
+
+renderProgress();
+
+async function exportPDF() {
+  const btn = document.getElementById('exportPdfBtn');
+  btn.textContent = 'Generando PDF...';
+  btn.disabled = true;
+
+  // Build a clean light-mode HTML string for the PDF
+  const bizName = getVal('biz_name') || 'cliente';
+  const dichResults = dichos.map(([l,r], i) => {
+    const v = parseInt(document.getElementById('dicho'+i).value);
+    let side = v < 40 ? l : v > 60 ? r : 'Equilibrio';
+    let pct = v;
+    return { l, r, v, side, pct };
+  });
+
+  function pRow(k, v) {
+    if (!v) return '';
+    return `<tr><td style="color:#666;font-size:13px;padding:5px 0;width:170px;vertical-align:top">${k}</td><td style="font-size:13px;padding:5px 0;color:#111">${v}</td></tr>`;
+  }
+
+  function pSection(title, rows) {
+    if (!rows.replace(/\s/g,'')) return '';
+    return `
+      <div style="margin-bottom:24px;page-break-inside:avoid;">
+        <div style="font-family:sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#c47a3a;border-bottom:1px solid #e8e0d0;padding-bottom:6px;margin-bottom:12px">${title}</div>
+        <table style="width:100%;border-collapse:collapse">${rows}</table>
+      </div>`;
+  }
+
+  const dichoRows = dichResults.map(d => {
+    const leftW = d.v <= 50 ? (50 - d.v) : 0;
+    const rightW = d.v >= 50 ? (d.v - 50) : 0;
+    const bar = `
+      <div style="display:flex;align-items:center;gap:6px;margin:3px 0">
+        <span style="font-size:11px;color:#555;width:130px;text-align:right;flex-shrink:0">${d.l}</span>
+        <div style="flex:1;height:4px;background:#e8e0d0;border-radius:99px;position:relative">
+          ${d.v < 50 ? `<div style="position:absolute;height:100%;width:${leftW}%;right:50%;background:#c47a3a;border-radius:99px"></div>` : ''}
+          ${d.v > 50 ? `<div style="position:absolute;height:100%;width:${rightW}%;left:50%;background:#c47a3a;border-radius:99px"></div>` : ''}
+          <div style="position:absolute;left:50%;transform:translateX(-50%);top:-3px;width:2px;height:10px;background:#ccc"></div>
+        </div>
+        <span style="font-size:11px;color:#555;width:130px;flex-shrink:0">${d.r}</span>
+      </div>`;
+    return bar;
+  }).join('');
+
+  const html = `
+    <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;background:#fff;color:#111;padding:40px;max-width:720px;margin:0 auto">
+      <div style="margin-bottom:32px;border-bottom:3px solid #e8c97a;padding-bottom:20px">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:#c47a3a;margin-bottom:6px">Brief de Marketing</div>
+        <div style="font-size:28px;font-weight:800;color:#0d0d0f;letter-spacing:-0.02em">${getVal('biz_name') || 'Sin nombre'}</div>
+        <div style="font-size:14px;color:#888;margin-top:4px">${getVal('biz_industry') || getVal('biz_industry_other') || ''}</div>
+      </div>
+
+      ${pSection('El Negocio',
+        pRow('Nombre', getVal('biz_name')) +
+        pRow('Industria', getVal('biz_industry') || getVal('biz_industry_other')) +
+        pRow('Antigüedad', getVal('biz_age')) +
+        pRow('Dónde opera', getVal('biz_location')) +
+        pRow('URL / Perfil', getVal('biz_url')) +
+        pRow('Descripción', getVal('biz_desc')) +
+        pRow('Historia / Origen', getVal('biz_story'))
+      )}
+
+      ${pSection('Producto / Servicio',
+        pRow('Qué vende', getVal('prod_what')) +
+        pRow('Tipo', getRadio('prod_type')) +
+        pRow('Canal de venta', getRadio('prod_channel')) +
+        pRow('Precio / ticket', getVal('prod_price')) +
+        pRow('Modelo de compra', getVal('prod_model')) +
+        pRow('Diferencial único', getVal('prod_unique')) +
+        pRow('Beneficios', getVal('prod_benefits')) +
+        pRow('Prueba social', getVal('prod_proof'))
+      )}
+
+      ${pSection('Cliente Ideal',
+        pRow('Rango de edad', getVal('cli_age')) +
+        pRow('Género', getRadio('cli_gender')) +
+        pRow('Ubicación', getVal('cli_location')) +
+        pRow('Perfil detallado', getVal('cli_profile')) +
+        pRow('Dolor principal', getVal('cli_pain')) +
+        pRow('Objeción principal', getVal('cli_objection')) +
+        pRow('Redes que usa', getChecked('cli_social').join(', '))
+      )}
+
+      ${pSection('Competencia y Mercado',
+        pRow('Competidores', getVal('comp_names')) +
+        pRow('Diferenciación', getVal('comp_diff')) +
+        pRow('Posición actual', getRadio('comp_position')) +
+        pRow('Referencias', getVal('comp_inspiration'))
+      )}
+
+      ${pSection('Marketing Actual',
+        pRow('Presencia en redes', getChecked('mkt_presence').join(', ')) +
+        pRow('Contenido orgánico', getRadio('mkt_organic')) +
+        pRow('Publicidad paga', getRadio('mkt_paid')) +
+        pRow('Presupuesto mensual', getVal('mkt_budget')) +
+        pRow('Qué funcionó', getVal('mkt_best')) +
+        pRow('Qué no funcionó', getVal('mkt_worst')) +
+        pRow('Objetivo principal', getRadio('mkt_goal'))
+      )}
+
+      <div style="margin-bottom:24px">
+        <div style="font-family:sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#c47a3a;border-bottom:1px solid #e8e0d0;padding-bottom:6px;margin-bottom:16px">ADN de Marca — Dicotomías</div>
+        ${dichoRows}
+      </div>
+    </div>`;
+
+  const container = document.createElement('div');
+  container.innerHTML = html;
+  container.style.cssText = 'position:fixed;left:-9999px;top:0;width:720px;background:#fff';
+  document.body.appendChild(container);
+
+  try {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+    await pdf.html(container.firstElementChild, {
+      callback: function(doc) {
+        doc.save(`brief-${bizName.replace(/\s+/g,'-').toLowerCase()}.pdf`);
+      },
+      x: 0, y: 0,
+      width: 210,
+      windowWidth: 720,
+      autoPaging: 'text',
+      margin: [10, 0, 10, 0]
+    });
+  } catch(e) {
+    console.error(e);
+    alert('No se pudo generar el PDF. Intentá con Ctrl+P → Guardar como PDF.');
+  } finally {
+    document.body.removeChild(container);
+    btn.textContent = '↓ Descargar Brief como PDF';
+    btn.disabled = false;
+  }
+}
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</body>
+</html>
